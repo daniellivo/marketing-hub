@@ -36,7 +36,20 @@ Este documento te guía paso a paso para configurar la autenticación con Google
 5. Pega el **Client ID** y **Client Secret** de Google
 6. Haz clic en **"Save"**
 
-## Paso 2: Ejecutar Migración de Base de Datos
+## Paso 2: Configurar la URL de tu Sitio
+
+Actualiza el archivo `.env` con la URL de tu aplicación en producción:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://tu-dominio-production.vercel.app
+```
+
+**IMPORTANTE**: Esta URL es la que Google usará para redirigir después de la autenticación.
+- NO uses `localhost` aquí
+- Debe ser la URL pública de tu aplicación (Vercel, Netlify, etc.)
+- Si no la configuras, usará por defecto la URL de Supabase
+
+## Paso 3: Ejecutar Migración de Base de Datos
 
 Necesitas ejecutar la migración SQL para crear la tabla de whitelist:
 
@@ -51,7 +64,7 @@ O usando la CLI de Supabase:
 supabase db push
 ```
 
-## Paso 3: Agregar Emails a la Whitelist
+## Paso 4: Agregar Emails a la Whitelist
 
 ### Opción A: Usando el SQL Editor de Supabase
 
@@ -69,7 +82,7 @@ INSERT INTO whitelist (email, reason, is_active) VALUES
 
 Puedes crear una interfaz de administración en tu app para gestionar la whitelist.
 
-## Paso 4: Verificar la Configuración
+## Paso 5: Verificar la Configuración
 
 1. Inicia tu aplicación: `npm run dev`
 2. Ve a `/login`
