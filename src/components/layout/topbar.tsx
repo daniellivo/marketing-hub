@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { User, Settings, LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 interface TopbarProps {
@@ -27,6 +27,7 @@ export function Topbar({ user }: TopbarProps) {
 
   async function handleLogout() {
     try {
+      const supabase = createClient()
       await supabase.auth.signOut()
       toast.success('Sesión cerrada')
       router.push('/login')

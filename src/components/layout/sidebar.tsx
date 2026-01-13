@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { Lightbulb, FileText, PenTool, Settings, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
@@ -34,6 +34,7 @@ export function Sidebar() {
 
   async function handleLogout() {
     try {
+      const supabase = createClient()
       await supabase.auth.signOut()
       toast.success('Sesión cerrada')
       router.push('/login')
