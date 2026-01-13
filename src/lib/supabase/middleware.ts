@@ -59,6 +59,31 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   )
 
+  // Check whitelist for authenticated users on protected routes
+  if (user && isProtectedPath) {
+    const userEmail = user.email
+
+    if (userEmail) {
+      // Check if the email is whitelisted
+      const { data: whitelistData, error: whitelistError } = await supabase
+        .from('whitelist')
+        .select('*')
+        .eq('email', userEmail)
+        .eq('is_active', true)
+        .single()
+
+      if (whitelistError || !whitelistData) {
+        // Email not whitelisted - sign out and redirect to login
+        await supabase.auth.signOut()
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        url.searchParams.set('error', 'unauthorized')
+        url.searchParams.set('email', userEmail)
+        return NextResponse.redirect(url)
+      }
+    }
+  }
+
   // Redirect to login if not authenticated and trying to access protected route
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone()
