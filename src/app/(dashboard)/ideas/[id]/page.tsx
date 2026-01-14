@@ -34,6 +34,13 @@ export default async function IdeaDetailPage({ params }: { params: Promise<{ id:
     .eq('idea_id', id)
     .maybeSingle() as { data: { id: string; created_at: string; status: string } | null }
 
+  // Check if article exists
+  const { data: article } = await supabase
+    .from('articles')
+    .select('id, created_at, status, title')
+    .eq('idea_id', id)
+    .maybeSingle() as { data: { id: string; created_at: string; status: string; title: string } | null }
+
   const priorityColors = {
     low: 'bg-gray-100 text-gray-800',
     medium: 'bg-blue-100 text-blue-800',
@@ -150,35 +157,62 @@ export default async function IdeaDetailPage({ params }: { params: Promise<{ id:
           <CardDescription>Acciones disponibles para esta idea</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          {/* Step 1: Generate Outline */}
           {outline ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 border rounded-lg bg-green-50">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-green-600" />
-                  <div>
-                    <p className="font-medium text-green-900">Outline generado</p>
-                    <p className="text-sm text-green-700">
-                      Creado el {new Date(outline.created_at).toLocaleDateString('es-ES')}
-                    </p>
-                  </div>
+            <div className="flex items-center justify-between p-4 border rounded-lg bg-green-50">
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5 text-green-600" />
+                <div>
+                  <p className="font-medium text-green-900">✓ Outline generado</p>
+                  <p className="text-sm text-green-700">
+                    Creado el {new Date(outline.created_at).toLocaleDateString('es-ES')}
+                  </p>
                 </div>
-                <Link href={`/outlines/${outline.id}`}>
-                  <Button size="sm">
-                    <Eye className="mr-2 h-4 w-4" />
-                    Ver Outline
-                  </Button>
-                </Link>
               </div>
-              <p className="text-xs text-muted-foreground text-center">
-                Puedes visualizar y editar el outline generado
-              </p>
+              <Link href={`/outlines/${outline.id}`}>
+                <Button size="sm">
+                  <Eye className="mr-2 h-4 w-4" />
+                  Ver Outline
+                </Button>
+              </Link>
             </div>
           ) : (
-            <>
+            <div className="space-y-3">
               <GenerateOutlineButton ideaId={idea.id} />
               <p className="text-xs text-muted-foreground text-center">
-                La AI generará una estructura detallada basada en el template seleccionado y la knowledge base de Livo
+                Paso 1: Genera un outline estructurado con AI
               </p>
+            </div>
+          )}
+
+          {/* Step 2: Create Article (only show if outline exists) */}
+          {outline && (
+            <>
+              {article ? (
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-purple-50">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-purple-600" />
+                    <div>
+                      <p className="font-medium text-purple-900">✓ Artículo creado</p>
+                      <p className="text-sm text-purple-700">
+                        {article.title}
+                      </p>
+                    </div>
+                  </div>
+                  <Link href={`/articles/${article.id}`}>
+                    <Button size="sm">
+                      <Eye className="mr-2 h-4 w-4" />
+                      Ver Artículo
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="p-4 border rounded-lg border-dashed">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Paso 2: Ve al outline y apruébalo para crear el artículo editable
+                  </p>
+                </div>
+              )}
             </>
           )}
         </CardContent>

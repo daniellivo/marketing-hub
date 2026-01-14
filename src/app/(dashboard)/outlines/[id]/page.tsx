@@ -12,15 +12,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { ArrowLeft, Edit, FileText } from 'lucide-react'
+import { CreateArticleButton } from '@/components/articles/create-article-button'
 
-export default async function OutlineViewPage({ params }: { params: { id: string } }) {
+export default async function OutlineViewPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
+  const { id } = await params
 
   // Fetch outline
   const { data, error } = await supabase
     .from('outlines')
     .select('*, content_ideas(*)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (error || !data) {
@@ -29,6 +31,13 @@ export default async function OutlineViewPage({ params }: { params: { id: string
 
   // Type cast to work around Supabase type inference issues
   const outline = data as any
+
+  // Check if an article already exists for this outline
+  const { data: existingArticle } = await supabase
+    .from('articles')
+    .select('id')
+    .eq('outline_id', id)
+    .maybeSingle() as { data: { id: string } | null }
 
   // Convert outline content to Tiptap format
   const tiptapContent = outlineToTiptap(outline.content)
@@ -94,6 +103,31 @@ export default async function OutlineViewPage({ params }: { params: { id: string
               <p className="text-sm">{outline.content.sections?.length || 0} secciones</p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Create Article Card */}
+      <Card className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader>
+          <CardTitle>Siguiente Paso: Crear Artículo</CardTitle>
+          <CardDescription>
+            {existingArticle
+              ? 'Ya has creado un artículo desde este outline.'
+              : 'Cuando estés listo, crea un artículo editable desde este outline aprobado.'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CreateArticleButton
+            outlineId={id}
+            hasArticle={!!existingArticle}
+          />
+          {existingArticle && (
+            <Link href={`/articles/${existingArticle.id}`} className="block mt-3">
+              <Button variant="outline" className="w-full">
+                Ver Artículo Creado
+              </Button>
+            </Link>
+          )}
         </CardContent>
       </Card>
 

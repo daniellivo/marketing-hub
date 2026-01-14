@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         template_type,
         keywords,
         priority,
-        status: 'draft',
+        status: 'new',
       })
       .select()
       .single()
