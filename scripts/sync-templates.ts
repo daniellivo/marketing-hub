@@ -34,15 +34,6 @@ const templateMapping: Record<string, TemplateType> = {
   'template-thought-leadership.md': 'thought-leadership',
 }
 
-function extractTemplateName(filename: string): string {
-  // Remove 'template-' prefix and '.md' extension, convert to title case
-  return filename
-    .replace('template-', '')
-    .replace('.md', '')
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
 
 async function syncTemplates() {
   console.log('🚀 Starting Templates sync...\n')
@@ -83,17 +74,12 @@ async function syncTemplates() {
         continue
       }
 
-      // Extract template name
-      const templateName = frontmatter.title || extractTemplateName(file)
-      const description = frontmatter.description || `Template for ${templateName.toLowerCase()} content`
-
       // Prepare data for insert
       const { error } = await (supabase as any)
         .from('templates')
         .upsert({
           template_type: templateType,
-          name: templateName,
-          description: description,
+          file_path: `templates/${file}`,
           content: content,
           structure: frontmatter.structure || null,
           last_synced: new Date().toISOString(),
