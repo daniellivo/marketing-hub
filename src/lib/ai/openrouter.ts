@@ -39,7 +39,7 @@ export async function generateContent(
     headers: {
       'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.OPENROUTER_APP_URL || 'http://localhost:3000',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://marketing-hub-liard.vercel.app',
       'X-Title': process.env.OPENROUTER_APP_TITLE || 'Livo Content Platform',
     },
     body: JSON.stringify({
@@ -99,7 +99,7 @@ export async function generateWithHistory(
     headers: {
       'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.OPENROUTER_APP_URL || 'http://localhost:3000',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://marketing-hub-liard.vercel.app',
       'X-Title': process.env.OPENROUTER_APP_TITLE || 'Livo Content Platform',
     },
     body: JSON.stringify({

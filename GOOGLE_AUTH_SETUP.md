@@ -19,11 +19,11 @@ Este documento te guía paso a paso para configurar la autenticación con Google
    - **Application type**: Web application
    - **Name**: Livo Content Platform
    - **Authorized JavaScript origins**:
-     - `http://localhost:3000` (para desarrollo)
-     - `https://tu-dominio.com` (para producción)
+     - `https://marketing-hub-liard.vercel.app`
+     - `https://eoqlhmzrodxfpvviugll.supabase.co`
    - **Authorized redirect URIs**:
      - `https://eoqlhmzrodxfpvviugll.supabase.co/auth/v1/callback`
-     - `http://localhost:54321/auth/v1/callback` (si usas Supabase local)
+     - `https://marketing-hub-liard.vercel.app/auth/callback`
 
 7. **Copia el Client ID y Client Secret** que se generan
 
@@ -84,12 +84,13 @@ Puedes crear una interfaz de administración en tu app para gestionar la whiteli
 
 ## Paso 5: Verificar la Configuración
 
-1. Inicia tu aplicación: `npm run dev`
-2. Ve a `/login`
-3. Haz clic en **"Iniciar sesión con Google"**
-4. Selecciona una cuenta de Google
-5. Si el email está en la whitelist, deberías ser redirigido a `/ideas`
-6. Si el email NO está en la whitelist, verás un mensaje de error
+1. Ve a tu aplicación en producción: `https://marketing-hub-liard.vercel.app/login`
+2. Haz clic en **"Iniciar sesión con Google"**
+3. Selecciona una cuenta de Google
+4. Si el email está en la whitelist, deberías ser redirigido a `/ideas`
+5. Si el email NO está en la whitelist, verás un mensaje de error
+
+**Nota**: La aplicación ya NO usa localhost. Siempre redirige a la URL de producción configurada en `NEXT_PUBLIC_SITE_URL`.
 
 ## Gestión de la Whitelist
 
