@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { ArrowLeft, Edit, FileText } from 'lucide-react'
 import { CreateArticleButton } from '@/components/articles/create-article-button'
+import { OutlineSidebar } from '@/components/outlines/outline-sidebar'
 
 export default async function OutlineViewPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -43,7 +44,15 @@ export default async function OutlineViewPage({ params }: { params: Promise<{ id
   const tiptapContent = outlineToTiptap(outline.content)
 
   return (
-    <div className="container mx-auto py-6 max-w-5xl">
+    <>
+      {/* Sidebar with SEO metadata */}
+      <OutlineSidebar
+        metaDescription={outline.content.meta_description}
+        seoNotes={outline.content.seo_notes}
+        internalLinking={outline.content.internal_linking}
+      />
+
+      <div className="container mx-auto py-6 max-w-5xl pr-96">
       {/* Header */}
       <div className="mb-6">
         <Link href="/ideas" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
@@ -146,6 +155,7 @@ export default async function OutlineViewPage({ params }: { params: Promise<{ id
           <TiptapEditor content={tiptapContent} editable={false} />
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   )
 }

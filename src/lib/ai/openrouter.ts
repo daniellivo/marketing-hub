@@ -23,7 +23,7 @@ export async function generateContent(
   options: GenerateOptions = {}
 ): Promise<string> {
   const {
-    model = process.env.OPENROUTER_DEFAULT_MODEL || 'anthropic/claude-3.5-sonnet',
+    model = process.env.OPENROUTER_DEFAULT_MODEL || 'anthropic/claude-sonnet-4.5',
     maxTokens = 4000,
     temperature = 0.7,
     stream = false,
@@ -84,7 +84,7 @@ export async function generateWithHistory(
   options: GenerateOptions = {}
 ): Promise<string> {
   const {
-    model = process.env.OPENROUTER_DEFAULT_MODEL || 'anthropic/claude-3.5-sonnet',
+    model = process.env.OPENROUTER_DEFAULT_MODEL || 'anthropic/claude-sonnet-4.5',
     maxTokens = 4000,
     temperature = 0.7,
     stream = false,

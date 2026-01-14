@@ -6,11 +6,21 @@
 // Types for Outline structure
 export interface OutlineContent {
   title: string
-  introduction: string
+  meta_description?: string
+  introduction: {
+    hook: string
+    context: string
+    key_points: string[]
+  }
   sections: Section[]
-  faq: string[]
-  conclusion: string
-  cta: string
+  faq: FAQItem[]
+  conclusion: {
+    summary: string
+    cta: string
+    next_steps: string[]
+  }
+  internal_linking?: InternalLink[]
+  seo_notes?: SEONotes
 }
 
 export interface Section {
@@ -18,6 +28,24 @@ export interface Section {
   h3s: string[]
   key_points: string[]
   notes?: string
+}
+
+export interface FAQItem {
+  question: string
+  answer_guidance: string
+}
+
+export interface InternalLink {
+  anchor: string
+  target: string
+  section: string
+}
+
+export interface SEONotes {
+  primary_keyword: string
+  secondary_keywords: string[]
+  keyword_density: string
+  search_intent: string
 }
 
 /**
@@ -42,10 +70,59 @@ export function outlineToTiptap(outline: OutlineContent): any {
       attrs: { level: 2 },
       content: [{ type: 'text', text: 'Introducción' }],
     })
-    nodes.push({
-      type: 'paragraph',
-      content: [{ type: 'text', text: outline.introduction }],
-    })
+
+    // Hook (destacado)
+    if (outline.introduction.hook) {
+      nodes.push({
+        type: 'heading',
+        attrs: { level: 3 },
+        content: [{ type: 'text', text: 'Hook' }],
+      })
+      nodes.push({
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text: outline.introduction.hook,
+            marks: [{ type: 'bold' }],
+          },
+        ],
+      })
+    }
+
+    // Context
+    if (outline.introduction.context) {
+      nodes.push({
+        type: 'heading',
+        attrs: { level: 3 },
+        content: [{ type: 'text', text: 'Contexto' }],
+      })
+      nodes.push({
+        type: 'paragraph',
+        content: [{ type: 'text', text: outline.introduction.context }],
+      })
+    }
+
+    // Key Points
+    if (outline.introduction.key_points?.length > 0) {
+      nodes.push({
+        type: 'heading',
+        attrs: { level: 3 },
+        content: [{ type: 'text', text: 'Puntos Clave' }],
+      })
+      nodes.push({
+        type: 'bulletList',
+        content: outline.introduction.key_points.map((point) => ({
+          type: 'listItem',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: point }],
+            },
+          ],
+        })),
+      })
+    }
   }
 
   // Sections
@@ -98,17 +175,39 @@ export function outlineToTiptap(outline: OutlineContent): any {
       attrs: { level: 2 },
       content: [{ type: 'text', text: 'Preguntas Frecuentes (FAQ)' }],
     })
-    nodes.push({
-      type: 'bulletList',
-      content: outline.faq.map((question) => ({
-        type: 'listItem',
+
+    // Each FAQ item as Q&A format
+    outline.faq.forEach((faqItem) => {
+      // Question (bold)
+      nodes.push({
+        type: 'paragraph',
         content: [
           {
-            type: 'paragraph',
-            content: [{ type: 'text', text: question }],
+            type: 'text',
+            text: `❓ ${faqItem.question}`,
+            marks: [{ type: 'bold' }],
           },
         ],
-      })),
+      })
+
+      // Answer guidance (normal text)
+      if (faqItem.answer_guidance) {
+        nodes.push({
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: `💡 ${faqItem.answer_guidance}`,
+            },
+          ],
+        })
+      }
+
+      // Add spacing between FAQ items
+      nodes.push({
+        type: 'paragraph',
+        content: [],
+      })
     })
   }
 
@@ -119,23 +218,59 @@ export function outlineToTiptap(outline: OutlineContent): any {
       attrs: { level: 2 },
       content: [{ type: 'text', text: 'Conclusión' }],
     })
-    nodes.push({
-      type: 'paragraph',
-      content: [{ type: 'text', text: outline.conclusion }],
-    })
-  }
 
-  // Call to Action (CTA)
-  if (outline.cta) {
-    nodes.push({
-      type: 'heading',
-      attrs: { level: 2 },
-      content: [{ type: 'text', text: 'Llamada a la Acción' }],
-    })
-    nodes.push({
-      type: 'paragraph',
-      content: [{ type: 'text', text: outline.cta }],
-    })
+    // Summary
+    if (outline.conclusion.summary) {
+      nodes.push({
+        type: 'heading',
+        attrs: { level: 3 },
+        content: [{ type: 'text', text: 'Resumen' }],
+      })
+      nodes.push({
+        type: 'paragraph',
+        content: [{ type: 'text', text: outline.conclusion.summary }],
+      })
+    }
+
+    // CTA (destacado con bold)
+    if (outline.conclusion.cta) {
+      nodes.push({
+        type: 'heading',
+        attrs: { level: 3 },
+        content: [{ type: 'text', text: 'Llamada a la Acción' }],
+      })
+      nodes.push({
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text: `🎯 ${outline.conclusion.cta}`,
+            marks: [{ type: 'bold' }],
+          },
+        ],
+      })
+    }
+
+    // Next Steps (numbered list)
+    if (outline.conclusion.next_steps?.length > 0) {
+      nodes.push({
+        type: 'heading',
+        attrs: { level: 3 },
+        content: [{ type: 'text', text: 'Próximos Pasos' }],
+      })
+      nodes.push({
+        type: 'orderedList',
+        content: outline.conclusion.next_steps.map((step) => ({
+          type: 'listItem',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: step }],
+            },
+          ],
+        })),
+      })
+    }
   }
 
   return {
